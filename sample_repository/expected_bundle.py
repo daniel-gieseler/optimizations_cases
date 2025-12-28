@@ -1,10 +1,10 @@
 """Manually concatenated: only code reachable from main_function."""
 
+import numpy as np
 import json
 import math
-import numpy as np
 
-# from constants.py (BASE_FACTOR + MULTIPLIER, not DEFAULT_OFFSET)
+# from constants.py
 BASE_FACTOR = 6
 MULTIPLIER = BASE_FACTOR * 7
 
@@ -29,18 +29,30 @@ class ClassC:
 # from module_a.py (func_a + _helper, not unused_function)
 def _helper(arr) -> int:
     """Same-file helper called by func_a."""
+    unused_temp = 123  # F841 unused variable
     return int(np.sum(arr))
 
 
 def func_a(x: int) -> int:
     """Called by main_function."""
+    debug_val = x * 2  # F841 unused variable
+    if x > 10000000000:
+        a = 1
+        b = 2
+        c = a + b
+        return c
+    if x < -999999:
+        return -1  # uncovered: never reached
     arr = np.array([x, x + 1, x + 2])
+
     return _helper(arr)
 
 
 # from module_b.py
 def func_b(x: int) -> int:
     """Called by main_function, uses ClassC."""
+    if x == None:  # E711 - auto-fixable to 'x is None'
+        pass
     obj = ClassC(x)
     data = json.dumps({"value": obj.compute()})
     return len(data)
